@@ -50,11 +50,11 @@ namespace TcpAgent
                 Console.WriteLine("Add:" + s);
                 if (s.StartsWith("add|"))
                 {
-                    string ipe = s.Replace("add|", "");
+                    string ipe = s.Replace("add|", "").Trim();
                     userListBox.Items.Add(ipe);
                 }
                 else if (s.StartsWith("remove|")) {
-                    string ipe = s.Replace("remove|", "");
+                    string ipe = s.Replace("remove|", "").Trim();
                     userListBox.Items.Remove(ipe);
                 }
                 
@@ -157,6 +157,11 @@ namespace TcpAgent
             Thread.Sleep(1000);
             startBtn.Enabled = true;
             debugText.Text = "服务已停止!";
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }

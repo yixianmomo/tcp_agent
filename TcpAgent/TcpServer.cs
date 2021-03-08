@@ -23,9 +23,9 @@ namespace TcpAgent
         private static int maxListen;
         private Thread listenThread = null;
         private List<AgentObj> users = new List<AgentObj>();
-        private static object addLock = new object();//创建锁
-        private static object removeLock = new object();//创建锁
+        private static object socketObj = new object();    
         Form1.UserListDelegate userListDelegate = null;
+        private static bool isListen = false;
        
 
         private TcpServer()
@@ -39,6 +39,7 @@ namespace TcpAgent
             port = mPort;
             agentPort = mAgentPort;
             maxListen = mMaxListen;
+            isListen = true;
             if (null == tcpServer) {
                 lock (objlock)
                 {
@@ -88,11 +89,10 @@ namespace TcpAgent
             try
             {
                 server.Listen(maxListen);
-                while (true)
+                while (isListen)
                 {
                     Socket cs = server.Accept();
-                    IPEndPoint clientipe = (IPEndPoint)cs.RemoteEndPoint;
-                    Console.Write(clientipe.Address.ToString() + ":" + clientipe.Port.ToString());
+                    IPEndPoint clientipe = (IPEndPoint)cs.RemoteEndPoint;                    
                     userListDelegate.Invoke("add|" + clientipe.Address.ToString() + ":" + clientipe.Port.ToString());
                     Socket agentSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     agentSocket.Connect(new IPEndPoint(IPAddress.Parse(address), agentPort));
@@ -121,16 +121,15 @@ namespace TcpAgent
         {
             try
             {
-                foreach (AgentObj item in users)
-                {
-                    closeAgent(item);
+                for (int i = 0; i < users.Count; i++) {
+                    closeAgent(users[i]);
                     Thread.Sleep(100);
-
                 }
-
+                isListen = false;
                 if (null != server)
                 {
                     server.Close();
+                    server = null;
                     Console.WriteLine("服务关闭成功");
                 }
                 tcpServer = null;
@@ -148,7 +147,7 @@ namespace TcpAgent
         private void addAgent(AgentObj obj)
         {
 
-            lock (addLock) {
+            lock (socketObj) {
 
                 users.Add(obj);
             }
@@ -159,15 +158,16 @@ namespace TcpAgent
 
         private void  closeAgent(AgentObj obj)
         {
-            try
+
+            lock (socketObj)
             {
-                lock (removeLock)
+                try
                 {
                     if (null != obj)
                     {
                         if (null != obj.socket)
                         {
-                            IPEndPoint clientipe = (IPEndPoint)obj.socket.RemoteEndPoint;                          
+                            IPEndPoint clientipe = (IPEndPoint)obj.socket.RemoteEndPoint;
                             userListDelegate.Invoke("remove|" + clientipe.Address.ToString() + ":" + clientipe.Port.ToString());
                             obj.socket.Close();
                         }
@@ -181,10 +181,11 @@ namespace TcpAgent
                         }
                     }
                 }
+                catch (Exception e)
+                {
+                }
             }
-            catch (Exception e) {
-            }
-           
+
         }
 
         private void response(object o)

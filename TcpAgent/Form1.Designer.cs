@@ -120,7 +120,7 @@
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Location = new System.Drawing.Point(170, 81);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(361, 121);
+            this.groupBox2.Size = new System.Drawing.Size(361, 73);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "工作参数设置";
@@ -177,10 +177,10 @@
             // 
             this.debugText.BackColor = System.Drawing.SystemColors.InfoText;
             this.debugText.ForeColor = System.Drawing.Color.White;
-            this.debugText.Location = new System.Drawing.Point(170, 208);
+            this.debugText.Location = new System.Drawing.Point(170, 160);
             this.debugText.Multiline = true;
             this.debugText.Name = "debugText";
-            this.debugText.Size = new System.Drawing.Size(361, 95);
+            this.debugText.Size = new System.Drawing.Size(361, 143);
             this.debugText.TabIndex = 6;
             // 
             // authorLabel
@@ -219,6 +219,7 @@
             this.MinimizeBox = false;
             this.Name = "Form1";
             this.Text = "TCP协议代理转发工具";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
